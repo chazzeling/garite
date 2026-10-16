@@ -8,11 +8,13 @@ import { usePoke } from "../../store/poke";
 import { useMe } from "../../store/me";
 import { useRoom, useShownMembers } from "../../store/room";
 import { Character } from "./Character";
+import { useRoomLight } from "./useRoomLight";
 import { availableSeats, resolveSeats, SEATS, STAND_Y } from "./seating";
 
 // 플레이스홀더 방: 슬롯 위치에 이름 텍스트 박스, 캐릭터는 이모지
 export function RoomScene() {
-  const bg = roomBackground();
+  const light = useRoomLight();
+  const bg = roomBackground(light.stage.level);
   const shown = useShownMembers();
   const bubbles = useChat((s) => s.bubbles);
   const ownerId = useRoom((s) => s.ownerId);
@@ -41,11 +43,12 @@ export function RoomScene() {
   const standing = shown.filter((m) => !seated.get(m.userId));
 
   return (
+    <div className="room-wrap"><div className="room-frame" data-tauri-drag-region>
     <div
       className="room"
+      data-tauri-drag-region="deep"
       style={{
         background: bg.image ? `url(${bg.image}) center / 100% 100% no-repeat, ${bg.color}` : bg.color,
-        aspectRatio: `${bg.width} / ${bg.height}`,
       }}
     >
       {slots.filter((s) => equipped[s.id]).map((s) => (
@@ -114,5 +117,6 @@ export function RoomScene() {
         );
       })}
     </div>
+    </div></div>
   );
 }

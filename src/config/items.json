@@ -7,5 +7,18 @@
   {"id": "deco-plant", "name": "화분", "category": "deco", "unlockLevel": 2, "cost": 50},
   {"id": "deco-lamp", "name": "스탠드", "category": "deco", "unlockLevel": 4, "cost": 200},
   {"id": "rug-basic", "name": "기본 러그", "category": "rug", "unlockLevel": 1, "cost": 0},
-  {"id": "rug-round", "name": "둥근 러그", "category": "rug", "unlockLevel": 5, "cost": 300}
+  {"id": "rug-round", "name": "둥근 러그", "category": "rug", "unlockLevel": 5, "cost": 300},
+  {"id": "hair-short", "name": "숏컷", "category": "hair", "unlockLevel": 1, "cost": 0},
+  {"id": "hair-long", "name": "긴 머리", "category": "hair", "unlockLevel": 1, "cost": 0},
+  {"id": "hair-bob", "name": "단발", "category": "hair", "unlockLevel": 2, "cost": 60},
+  {"id": "hair-twin", "name": "양갈래", "category": "hair", "unlockLevel": 3, "cost": 120},
+  {"id": "hair-bun", "name": "똥머리", "category": "hair", "unlockLevel": 4, "cost": 150},
+  {"id": "outfit-tee", "name": "기본 티셔츠", "category": "outfit", "unlockLevel": 1, "cost": 0},
+  {"id": "outfit-hoodie", "name": "후드티", "category": "outfit", "unlockLevel": 2, "cost": 80},
+  {"id": "outfit-overalls", "name": "멜빵바지", "category": "outfit", "unlockLevel": 3, "cost": 150},
+  {"id": "outfit-dress", "name": "원피스", "category": "outfit", "unlockLevel": 4, "cost": 200},
+  {"id": "acc-glasses", "name": "안경", "category": "accessory", "unlockLevel": 2, "cost": 40},
+  {"id": "acc-ribbon", "name": "리본", "category": "accessory", "unlockLevel": 2, "cost": 60},
+  {"id": "acc-hat", "name": "모자", "category": "accessory", "unlockLevel": 3, "cost": 90},
+  {"id": "acc-headphones", "name": "헤드폰", "category": "accessory", "unlockLevel": 4, "cost": 180}
 ]

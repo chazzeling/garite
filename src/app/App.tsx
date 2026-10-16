@@ -12,7 +12,6 @@ import { ProfileSetup } from "../ui/common/ProfileSetup";
 import { KickedBanner } from "../ui/chat/KickedBanner";
 import { ServerBanner } from "../ui/common/ServerBanner";
 import { FullMode } from "../ui/modes/FullMode";
-import { MediumMode } from "../ui/modes/MediumMode";
 import { MiniMode } from "../ui/modes/MiniMode";
 import { ensureNotificationPermission } from "./notify";
 import { listenQuit } from "./quit";
@@ -67,11 +66,14 @@ export function App() {
   return (
     <>
       {consent === null && <ConsentDialog />}
-      <UpdateBanner />
-      <PokeBanner />
-      <KickedBanner />
-      <ServerBanner />
-      {mode === "medium" ? <MediumMode /> : <FullMode />}
+      <FullMode />
+      {/* 알림은 방 위에 겹쳐 뜬다(레이아웃을 밀지 않음 — 창 높이가 방 크기와 같아서 밀리면 컨트롤 줄이 잘린다) */}
+      <div className="banners">
+        <UpdateBanner />
+        <PokeBanner />
+        <KickedBanner />
+        <ServerBanner />
+      </div>
     </>
   );
 }

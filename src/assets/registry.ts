@@ -1,7 +1,9 @@
 // 그림이 생기면 sprites/ 폴더에 PNG를 넣는다 (규칙은 sprites/README.md). 코드는 건드리지 않는다.
 // PNG가 있으면 그 그림을, 없으면 플레이스홀더(이모지·텍스트)를 쓴다 — 완성된 것부터 하나씩 바꿔 끼울 수 있다.
 import items from "../config/items.json";
-import type { Motion, Pose, WorkState } from "../types";
+import stages from "../config/roomLevels.json";
+import type { AvatarSpec, Motion, Pose, WorkState } from "../types";
+import { HAIR_COLORS, OUTFIT_COLORS, SKIN_TONES } from "./avatar";
 
 // ── 그림 파일 색인 ─────────────────────────────
 // 파일명 끝의 @N 은 가로로 이어 붙인 프레임 수 (예: sit-typing@2.png = 16×16 프레임 2장)
@@ -29,6 +31,30 @@ export const characterImage = (avatarId: string, motion: Motion, pose: Pose): Sp
       `characters/${a}/${pose}`,
     ]),
   );
+
+/**
+ * 꾸민 캐릭터의 겹침 그림(아래→위: 몸, 옷, 머리, 악세서리). tint가 있는 층은 회색조로 그린 그림에 그 색을 곱해 입힌다.
+ * 몸 그림(characters/body/…)이 없으면 null — 호출하는 쪽이 통짜 스프라이트나 임시 표시로 대신한다.
+ * 옷·머리·악세서리는 그림이 있는 것만 겹친다 (일부만 그려도 동작).
+ */
+export type AvatarLayer = { image: SpriteImage; tint: string | null };
+
+const partImage = (kind: string, id: string, motion: Motion, pose: Pose): SpriteImage | null =>
+  first(
+    ...(motion === "none" ? [] : [`characters/${kind}/${id}/${pose}-${motion}`]),
+    `characters/${kind}/${id}/${pose}`,
+  );
+
+export function avatarLayers(a: AvatarSpec, motion: Motion, pose: Pose): AvatarLayer[] | null {
+  const body = first(...(motion === "none" ? [] : [`characters/body/${pose}-${motion}`]), `characters/body/${pose}`);
+  if (!body) return null;
+  const layers: AvatarLayer[] = [{ image: body, tint: SKIN_TONES[a.skin] }];
+  const add = (img: SpriteImage | null, tint: string | null) => img && layers.push({ image: img, tint });
+  add(partImage("outfit", a.outfit, motion, pose), OUTFIT_COLORS[a.outfitColor]);
+  add(partImage("hair", a.hair, motion, pose), HAIR_COLORS[a.hairColor]);
+  if (a.accessory !== "none") add(partImage("accessory", a.accessory, motion, pose), null);
+  return layers;
+}
 
 export const itemImage = (itemId: string): SpriteImage | null => first(`items/${itemId}`);
 export const faceImage = (avatarId: string): SpriteImage | null => first(`faces/${avatarId}`, "faces/default");
@@ -63,9 +89,11 @@ export const ROOM_W = 150;
 export const ROOM_H = 156;
 export const SPRITE_PX = 16; // 캐릭터 한 칸(16×16)
 
-export const roomBackground = () => ({
-  color: "#e4def6", // 플레이스홀더: 단색
-  image: roomImage()?.url ?? null,
+// 방 조명 단계(1~5)별로 배경을 바꾼다. 그림이 있으면 room/background-<단계>.png, 없으면 room/background.png,
+// 그것도 없으면 단계마다 점점 밝아지는 단색(config/roomLevels.json의 color).
+export const roomBackground = (level = 1) => ({
+  color: stages.find((s) => s.level === level)?.color ?? "#e4def6",
+  image: (first(`room/background-${level}`) ?? roomImage())?.url ?? null,
   width: ROOM_W,
   height: ROOM_H,
 });

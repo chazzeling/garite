@@ -1,8 +1,11 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 mod activity;
+mod oauth;
 
 use std::{
+    net::TcpListener,
+    process::Command,
     sync::atomic::{AtomicBool, Ordering},
     thread,
     time::Duration,
@@ -20,6 +23,50 @@ fn set_app_detection(enabled: bool) {
 #[tauri::command]
 fn quit_app(app: AppHandle) {
     app.exit(0);
+}
+
+// ── 구글 로그인 ─────────────────────────────────
+// 1) oauth_listen: 127.0.0.1:41729에서 콜백을 기다리기 시작(쿼리가 오면 "oauth-callback" 이벤트로 전달, 빈 문자열 = 시간 초과·취소)
+// 2) open_external: 시스템 브라우저로 로그인 주소를 연다(https만)
+#[tauri::command]
+fn oauth_listen(app: AppHandle) -> Result<(), String> {
+    if oauth::ACTIVE.swap(true, Ordering::SeqCst) {
+        return Err("이미 로그인 대기 중이에요.".into());
+    }
+    oauth::CANCEL.store(false, Ordering::SeqCst);
+    let listener = match TcpListener::bind(("127.0.0.1", oauth::PORT)) {
+        Ok(l) => l,
+        Err(e) => {
+            oauth::ACTIVE.store(false, Ordering::SeqCst);
+            return Err(format!("로그인용 포트({})를 열 수 없어요: {e}", oauth::PORT));
+        }
+    };
+    thread::spawn(move || {
+        let query = oauth::wait_for_callback(&listener, oauth::TIMEOUT).unwrap_or_default();
+        drop(listener);
+        oauth::ACTIVE.store(false, Ordering::SeqCst);
+        let _ = app.emit("oauth-callback", query);
+    });
+    Ok(())
+}
+
+#[tauri::command]
+fn oauth_cancel() {
+    oauth::CANCEL.store(true, Ordering::SeqCst);
+}
+
+#[tauri::command]
+fn open_external(url: String) -> Result<(), String> {
+    if !url.starts_with("https://") {
+        return Err("https 주소만 열 수 있어요.".into());
+    }
+    #[cfg(target_os = "macos")]
+    let spawned = Command::new("open").arg(&url).spawn();
+    #[cfg(target_os = "windows")]
+    let spawned = Command::new("rundll32").args(["url.dll,FileProtocolHandler", url.as_str()]).spawn();
+    #[cfg(all(unix, not(target_os = "macos")))]
+    let spawned = Command::new("xdg-open").arg(&url).spawn();
+    spawned.map(|_| ()).map_err(|e| e.to_string())
 }
 
 static QUITTING: AtomicBool = AtomicBool::new(false);
@@ -44,12 +91,13 @@ fn main() {
         .plugin(
             tauri_plugin_window_state::Builder::default()
                 .with_state_flags(StateFlags::SIZE | StateFlags::POSITION)
+                .with_denylist(&["chat", "shop"]) // 보조 창은 항상 정해 둔 크기로 연다
                 .build(),
         )
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_process::init())
-        .invoke_handler(tauri::generate_handler![set_app_detection, quit_app])
+        .invoke_handler(tauri::generate_handler![set_app_detection, quit_app, oauth_listen, oauth_cancel, open_external])
         // 메인 창을 닫으면 앱 종료 (채팅·상점 창도 함께 닫힘)
         .on_window_event(|window, event| {
             if window.label() == "main" {

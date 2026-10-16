@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import shops from "../../config/shops.json";
 import { levelOf } from "../../activity/level";
+import { formatCoins } from "../../activity/units";
 import { useEconomy } from "../../store/economy";
 import { useMe } from "../../store/me";
 import { ProfileSetup } from "../common/ProfileSetup";
+import { TitleBar } from "../common/TitleBar";
+import { AvatarEditor } from "./AvatarEditor";
 
-// 상점 창: 옷장 · 가구점 · 소품점. 상품 진열은 에셋이 준비된 뒤에 채운다.
+// 상점 창: 옷장(캐릭터 꾸미기) · 가구점 · 소품점. 가구·소품 진열은 에셋이 준비된 뒤에 채운다.
 export function ShopWindow() {
   const status = useMe((s) => s.status);
   const earned = useEconomy((s) => s.earned);
@@ -18,20 +21,23 @@ export function ShopWindow() {
 
   if (status === "needsProfile") return <ProfileSetup />;
   if (status !== "ready") {
-    return <div className="shop"><p className="hint">{status === "booting" ? "연결 중…" : "서버에 연결할 수 없어요"}</p></div>;
+    return (
+      <div className="shop">
+        <TitleBar title="상점" />
+        <p className="hint">{status === "booting" ? "연결 중…" : "서버에 연결할 수 없어요"}</p>
+      </div>
+    );
   }
 
   const current = shops.find((s) => s.id === tab) ?? shops[0];
 
   return (
     <div className="shop">
-      <header className="shop-head">
-        <b>상점</b>
-        <span className="wallet-top">
-          <span className="lv">Lv.{levelOf(earned)}</span>
-          <span className="coins"><i className="coin" />{earned - spent}</span>
-        </span>
-      </header>
+      <TitleBar title="상점" />
+      <div className="shop-head">
+        <span className="lv">Lv.{levelOf(earned)}</span>
+        <span className="coins"><i className="ember" />{formatCoins(earned - spent)}</span>
+      </div>
       <nav className="tabs">
         {shops.map((s) => (
           <button key={s.id} className={tab === s.id ? "active" : ""} onClick={() => setTab(s.id)}>
@@ -40,11 +46,15 @@ export function ShopWindow() {
         ))}
       </nav>
       <div className="shop-body">
+        {current.id === "wardrobe" ? (
+          <AvatarEditor />
+        ) : (
         <div className="empty">
           <div className="empty-icon">{current.icon}</div>
           <b>{current.label}</b>
           <p className="hint">{current.desc} · 상품을 준비하고 있어요.</p>
         </div>
+        )}
       </div>
     </div>
   );

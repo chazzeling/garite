@@ -5,17 +5,31 @@ function check<T>(res: { data: T; error: { message: string } | null }): T {
   return res.data;
 }
 
-export type EconomyRow = { earned: number; spent: number; roomTotal: number };
+export type EconomyRow = {
+  earned: number;
+  spent: number;
+  roomTotal: number;
+  /** 지금 방이 만들어진 뒤 경과 초 (서버 시각 기준, 방이 없으면 null) */
+  roomAgeSeconds: number | null;
+  /** 이 방에서 내가 "등록한 프로그램만" 모드로 기록한 분 수 */
+  roomWorkMinutes: number;
+};
 
 /** 1분 작업 기록. 서버가 분·방·적립량을 정한다. 이번에 적립된 코인(중복이면 0) */
-export async function logMinute(): Promise<number> {
-  return check(await supabase.rpc("log_minute"));
+export async function logMinute(strict: boolean): Promise<number> {
+  return check(await supabase.rpc("log_minute", { p_strict: strict }));
 }
 
 export async function fetchEconomy(): Promise<EconomyRow> {
   const rows = check(await supabase.rpc("get_economy"));
-  const r = (rows as { earned: number; spent: number; room_total: number }[])[0];
-  return { earned: Number(r?.earned ?? 0), spent: Number(r?.spent ?? 0), roomTotal: Number(r?.room_total ?? 0) };
+  const r = (rows as { earned: number; spent: number; room_total: number; room_age_seconds: number | null; room_work_minutes: number }[])[0];
+  return {
+    earned: Number(r?.earned ?? 0),
+    spent: Number(r?.spent ?? 0),
+    roomTotal: Number(r?.room_total ?? 0),
+    roomAgeSeconds: r?.room_age_seconds == null ? null : Number(r.room_age_seconds),
+    roomWorkMinutes: Number(r?.room_work_minutes ?? 0),
+  };
 }
 
 /** 레벨·잔액은 서버가 검증하고, 해금하면 해당 카테고리 슬롯에 자동 장착한다 */

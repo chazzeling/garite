@@ -5,5 +5,6 @@
   "presenceMinIntervalSeconds": 30,
   "focusTimeoutSeconds": 1800,
   "customTextMax": 30,
-  "pokeCooldownSeconds": 30
+  "pokeCooldownSeconds": 30,
+  "workMinuteThresholdSeconds": 40
 }

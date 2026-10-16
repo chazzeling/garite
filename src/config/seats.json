@@ -1,11 +1,11 @@
 {
-  "standY": 144,
+  "standY": 116,
   "seats": [
     { "id": "bed-1",  "slotId": "bed",  "pose": "lie", "x": 28, "y": 90 },
     { "id": "bed-2",  "slotId": "bed",  "pose": "lie", "x": 43, "y": 100 },
     { "id": "desk-1", "slotId": "desk", "pose": "sit", "x": 79, "y": 97 },
     { "id": "desk-2", "slotId": "desk", "pose": "sit", "x": 96, "y": 97 },
-    { "id": "rug-1",  "slotId": "rug",  "pose": "sit", "x": 53, "y": 128 },
-    { "id": "rug-2",  "slotId": "rug",  "pose": "sit", "x": 71, "y": 128 }
+    { "id": "rug-1",  "slotId": "rug",  "pose": "sit", "x": 53, "y": 118 },
+    { "id": "rug-2",  "slotId": "rug",  "pose": "sit", "x": 71, "y": 118 }
   ]
 }

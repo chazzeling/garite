@@ -13,10 +13,17 @@ const MESSAGES: Record<string, string> = {
   CANNOT_POKE_SELF: "나 자신은 찌를 수 없어요.",
   NOT_IN_ROOM: "방에 들어가 있어야 찌를 수 있어요.",
   TARGET_NOT_IN_ROOM: "그 사람은 이미 방에 없어요.",
+  AVATAR_INVALID: "꾸미기 값이 올바르지 않아요.",
+  AVATAR_ITEM_LOCKED: "아직 해금하지 않은 아이템이에요.",
+  OAUTH_TIMEOUT: "로그인 시간이 지났어요. 다시 시도해 주세요.",
+  "already linked": "이 구글 계정은 이미 다른 개릿 계정에 연결돼 있어요. 그 계정을 쓰려면 '구글로 로그인'을 눌러 주세요.",
+  "Manual linking is disabled": "계정 연결 설정이 아직 켜져 있지 않아요 (관리자 설정이 필요해요).",
+  "provider is not enabled": "구글 로그인이 아직 설정되지 않았어요 (관리자 설정이 필요해요).",
+  "Unsupported provider": "구글 로그인이 아직 설정되지 않았어요 (관리자 설정이 필요해요).",
   ITEM_NOT_FOUND: "없는 아이템이에요.",
   ALREADY_UNLOCKED: "이미 해금한 아이템이에요.",
   LEVEL_TOO_LOW: "레벨이 부족해요.",
-  NOT_ENOUGH_COINS: "코인이 부족해요.",
+  NOT_ENOUGH_COINS: "불씨가 부족해요.",
 };
 
 export function describeError(err: unknown): string {

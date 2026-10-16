@@ -1,5 +1,5 @@
 [
-  { "id": "wardrobe",  "label": "옷장",   "icon": "👕", "desc": "캐릭터 꾸미기", "categories": ["outfit"] },
+  { "id": "wardrobe",  "label": "옷장",   "icon": "👕", "desc": "캐릭터 꾸미기", "categories": ["hair", "outfit", "accessory"] },
   { "id": "furniture", "label": "가구점", "icon": "🛋️", "desc": "가구 꾸미기",   "categories": ["bed", "desk", "shelf", "rug"] },
   { "id": "props",     "label": "소품점", "icon": "🪴", "desc": "소품 꾸미기",   "categories": ["deco"] }
 ]

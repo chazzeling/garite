@@ -47,6 +47,7 @@ let userChannel: ReturnType<typeof openUserChannel> | null = null;
 
 const connectedAt = Date.now();
 let statusWatch: (() => void) | null = null;
+let avatarWatch: (() => void) | null = null;
 let isChatWindow = false;
 
 // Presence 전송 제한: 모션만 바뀐 경우는 마지막 전송 후 최소 N초 간격으로,
@@ -131,6 +132,7 @@ export const useRoom = create<RoomState>((set, get) => {
       return;
     }
     set({ ownerId, members: [], connection: "connecting" });
+    void useEconomy.getState().refresh(); // 방 시계(경과·작업 시간)를 이 방 기준으로
     const me = presenceOf();
     conn = connectRoom(ownerId, me, {
       onMembers: (members) => set({ members }),
@@ -191,7 +193,11 @@ export const useRoom = create<RoomState>((set, get) => {
       userChannel ??= openUserChannel(userId, {
         onRoomChanged: () => {},
         onKicked: (e) => void onKicked(e),
-        onEconomyChanged: () => void useEconomy.getState().refresh(), // 상점 창에서 해금·장착함
+        onEconomyChanged: () => {
+          // 상점 창에서 해금·장착·꾸미기를 바꿈
+          void useEconomy.getState().refresh();
+          void useMe.getState().refreshProfile();
+        },
         onPoke: (fromName) => void usePoke.getState().receive(fromName),
       });
       try {
@@ -223,6 +229,10 @@ export const useRoom = create<RoomState>((set, get) => {
       // 내 상태가 바뀔 때만 Presence 갱신 (무료 플랜 메시지 한도)
       statusWatch ??= useStatus.subscribe((s, prev) => {
         if (s.mine !== prev.mine) onMineChanged(s.mine);
+      });
+      // 캐릭터 꾸미기가 바뀌면 친구에게 바로 알림
+      avatarWatch ??= useMe.subscribe((s, prev) => {
+        if (s.profile?.avatarId !== prev.profile?.avatarId) sendPresence();
       });
       })().finally(() => (starting = null));
       return starting;

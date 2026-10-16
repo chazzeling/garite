@@ -7,7 +7,7 @@ const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
 export const isConfigured = Boolean(url && key);
 
 export const supabase = createClient(url ?? "http://localhost:54321", key ?? "missing", {
-  auth: { persistSession: true, autoRefreshToken: true },
+  auth: { persistSession: true, autoRefreshToken: true, flowType: "pkce", detectSessionInUrl: false }, // 구글 로그인(PKCE): 돌아온 code를 앱이 직접 교환한다
 });
 
 // 저장된 세션이 없으면 익명 로그인. 두 창은 같은 저장소를 공유하므로 같은 계정이 된다.

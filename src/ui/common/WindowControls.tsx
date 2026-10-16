@@ -1,13 +1,6 @@
 import { selectPinned, useWindowPrefs } from "../../store/windowPrefs";
 import { useStatus } from "../../store/status";
-import type { WindowMode } from "../../types";
-import { Icon, type IconName } from "./Icon";
-
-const MODES: { id: WindowMode; label: string; icon: IconName }[] = [
-  { id: "full", label: "최대", icon: "modeFull" },
-  { id: "medium", label: "중간", icon: "modeMedium" },
-  { id: "mini", label: "미니", icon: "modeMini" },
-];
+import { Icon } from "./Icon";
 
 export function WindowControls() {
   const mode = useWindowPrefs((s) => s.mode);
@@ -17,14 +10,15 @@ export function WindowControls() {
   const { setMode, togglePin, toggleChat } = useWindowPrefs.getState();
 
   return (
-    <div className="controls">
-      <div className="seg" role="group" aria-label="창 크기">
-        {MODES.map((m) => (
-          <button key={m.id} className={mode === m.id ? "active" : ""} onClick={() => setMode(m.id)} title={`${m.label} 모드`} aria-label={`${m.label} 모드`} aria-pressed={mode === m.id}>
-            <Icon name={m.icon} />
-          </button>
-        ))}
-      </div>
+    <div className="controls" data-tauri-drag-region>
+      <button
+        className="iconbtn"
+        onClick={() => setMode(mode === "full" ? "mini" : "full")}
+        title={mode === "full" ? "미니 모드로" : "일반 모드로"}
+        aria-label={mode === "full" ? "미니 모드로" : "일반 모드로"}
+      >
+        <Icon name={mode === "full" ? "modeMini" : "modeFull"} />
+      </button>
       <div className="icons">
         <button className={`iconbtn ${focus ? "on" : ""}`} onClick={useStatus.getState().toggleFocus} title="집중 모드" aria-pressed={focus}>
           <Icon name="target" />
@@ -34,6 +28,14 @@ export function WindowControls() {
         </button>
         <button className={`iconbtn ${chatOpen ? "on" : ""}`} onClick={toggleChat} title="채팅창" aria-pressed={chatOpen}>
           <Icon name="chat" />
+        </button>
+      </div>
+      <div className="icons winbtns">
+        <button className="iconbtn" onClick={() => void useWindowPrefs.getState().minimize()} title="내리기" aria-label="내리기">
+          <Icon name="minus" />
+        </button>
+        <button className="iconbtn" onClick={() => void useWindowPrefs.getState().close()} title="끄기" aria-label="끄기">
+          <Icon name="close" />
         </button>
       </div>
     </div>

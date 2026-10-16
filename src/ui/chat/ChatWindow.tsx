@@ -5,6 +5,7 @@ import { useMe } from "../../store/me";
 import { useRoom } from "../../store/room";
 import { Icon } from "../common/Icon";
 import { ProfileSetup } from "../common/ProfileSetup";
+import { TitleBar } from "../common/TitleBar";
 
 const formatTime = (iso: string) =>
   new Date(iso).toLocaleTimeString("ko-KR", { hour: "numeric", minute: "2-digit" });
@@ -43,13 +44,19 @@ export function ChatWindow() {
 
   if (status === "needsProfile") return <ProfileSetup />;
   if (status !== "ready") {
-    return <div className="chat">{status === "booting" ? "연결 중…" : "서버에 연결할 수 없어요"}</div>;
+    return (
+      <div className="chat">
+        <TitleBar title="채팅" />
+        <p className="hint">{status === "booting" ? "연결 중…" : "서버에 연결할 수 없어요"}</p>
+      </div>
+    );
   }
 
   const nameOf = (id: string | null) => (id === userId ? profile?.name : id && names[id]) || "…";
 
   return (
     <div className="chat">
+      <TitleBar title="채팅" />
       <div className="log">
         {groupMessages(messages).map((g) =>
           g.kind === "system" ? (

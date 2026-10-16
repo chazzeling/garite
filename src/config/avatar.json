@@ -1,0 +1,6 @@
+{
+  "skin": ["#ffe3cf", "#f7cfae", "#e6ad88", "#c98d68", "#9c6746", "#6c462e"],
+  "hairColors": ["#2b2230", "#5a3a28", "#8a5a32", "#c28a3a", "#e8c25a", "#d9d9d9", "#c0392b", "#e8708a", "#7561e8", "#3b7bd9", "#2fa58c", "#6bbf4a"],
+  "outfitColors": ["#ffffff", "#2b2230", "#8b86a6", "#c0392b", "#e8708a", "#f0a93b", "#e8c25a", "#6bbf4a", "#2fa58c", "#3b7bd9", "#7561e8", "#a55bd9"],
+  "defaults": { "skin": 1, "hair": "hair-short", "hairColor": 0, "outfit": "outfit-tee", "outfitColor": 9, "accessory": "none" }
+}

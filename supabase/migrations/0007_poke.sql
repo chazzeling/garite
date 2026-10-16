@@ -2,8 +2,9 @@
 --   * 방장 권한과 무관: 호출자와 대상이 같은 방(방장 또는 활성 멤버)에 있으면 누구나 누구에게.
 --   * 같은 사람→같은 사람은 30초에 한 번 (스팸 방지). 값을 바꾸려면 아래 interval과 config/activity.json의 pokeCooldownSeconds를 같이 바꾼다.
 --   * 알림은 대상의 user:{id} 비공개 채널로 'poke' 이벤트를 보낸다. 클라이언트가 직접 쓰지 못하고 이 RPC로만.
+-- 이 파일은 다시 실행해도 안전하다.
 
-create table public.poke_cooldown (
+create table if not exists public.poke_cooldown (
   sender_id uuid not null references public.profiles (id) on delete cascade,
   target_id uuid not null references public.profiles (id) on delete cascade,
   last_at   timestamptz not null,

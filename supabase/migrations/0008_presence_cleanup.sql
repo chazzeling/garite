@@ -4,9 +4,10 @@
 --   * 정리는 별도 스케줄러 없이, 누군가 heartbeat()나 join_room()을 호출할 때 함께 한다.
 --   * 정상 종료는 앱이 직접 leave_room / close_room을 부른다(이 마이그레이션과 무관).
 -- 임계값(3분)과 앱의 호출 주기(1분)를 바꾸면 서로 맞춰 둘 것.
+-- 이 파일은 다시 실행해도 안전하다.
 
-alter table public.room_members add column last_seen timestamptz not null default now();
-create index room_members_active_seen on public.room_members (last_seen) where is_active;
+alter table public.room_members add column if not exists last_seen timestamptz not null default now();
+create index if not exists room_members_active_seen on public.room_members (last_seen) where is_active;
 
 create or replace function public.sweep_stale_members()
 returns void language plpgsql security definer set search_path = public as $$

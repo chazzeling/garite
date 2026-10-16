@@ -1,4 +1,4 @@
-export type WindowMode = "full" | "medium" | "mini";
+export type WindowMode = "full" | "mini";
 
 export type WorkState = "working" | "idle" | "away";
 export type Pose = "stand" | "sit" | "lie";
@@ -21,6 +21,16 @@ export type MemberStatus = {
   appLabel: string | null;
   customText: string | null;
   focusMode: boolean;
+};
+
+// 캐릭터 꾸미기: 머리·옷·악세서리 종류(아이템 id)와 색(팔레트 번호). avatarId 문자열로 저장·공유된다 (assets/avatar.ts)
+export type AvatarSpec = {
+  skin: number;
+  hair: string;
+  hairColor: number;
+  outfit: string;
+  outfitColor: number;
+  accessory: string; // 아이템 id 또는 "none"
 };
 
 export type Profile = { id: string; name: string; avatarId: string };

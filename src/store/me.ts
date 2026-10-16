@@ -1,7 +1,8 @@
 import { create } from "zustand";
-import type { Profile, RoomInfo } from "../types";
+import type { AvatarSpec, Profile, RoomInfo } from "../types";
 import { describeError } from "../net/errors";
 import { fetchMyRoom, fetchProfile, regenerateCode, saveProfile, setRoomOpen } from "../net/rpc";
+import { DEFAULT_AVATAR, encodeAvatar } from "../assets/avatar";
 import { ensureSession, isConfigured } from "../net/supabase";
 
 type MeStatus = "booting" | "needsProfile" | "ready" | "offline";
@@ -16,6 +17,10 @@ interface MeState {
   createProfile: (name: string) => Promise<void>;
   toggleOpen: () => Promise<void>;
   reissueCode: () => Promise<void>;
+  /** 캐릭터 꾸미기 저장 (서버가 해금 여부를 검증). 실패하면 사유 문구, 성공하면 null */
+  setAvatar: (spec: AvatarSpec) => Promise<string | null>;
+  /** 다른 창에서 바꾼 프로필을 다시 읽음 */
+  refreshProfile: () => Promise<void>;
   setMyRoom: (room: RoomInfo | null) => void;
 }
 
@@ -57,7 +62,7 @@ export const useMe = create<MeState>((set, get) => ({
     const { userId } = get();
     if (!userId) return;
     try {
-      const profile = await saveProfile(userId, name.trim(), "default");
+      const profile = await saveProfile(userId, name.trim(), encodeAvatar(DEFAULT_AVATAR));
       const myRoom = await fetchMyRoom(userId);
       set({ profile, myRoom, status: "ready", error: null });
     } catch (err) {
@@ -66,6 +71,28 @@ export const useMe = create<MeState>((set, get) => ({
   },
 
   setMyRoom: (myRoom) => set({ myRoom }),
+
+  setAvatar: async (spec) => {
+    const { userId, profile } = get();
+    if (!userId || !profile) return "프로필이 없어요.";
+    try {
+      set({ profile: await saveProfile(userId, profile.name, encodeAvatar(spec)) });
+      return null;
+    } catch (err) {
+      return describeError(err);
+    }
+  },
+
+  refreshProfile: async () => {
+    const { userId } = get();
+    if (!userId) return;
+    try {
+      const profile = await fetchProfile(userId);
+      if (profile) set({ profile });
+    } catch {
+      /* 다음에 다시 */
+    }
+  },
 
   toggleOpen: async () => {
     const { userId, myRoom } = get();

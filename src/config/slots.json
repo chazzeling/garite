@@ -1,7 +1,7 @@
 [
   {"id": "bed",    "category": "bed",   "x": 23,  "y": 62,  "z": 10, "w": 41, "h": 41},
   {"id": "desk",   "category": "desk",  "x": 75,  "y": 69,  "z": 20, "w": 38, "h": 37},
-  {"id": "shelf",  "category": "shelf", "x": 113, "y": 25,  "z": 5,  "w": 24, "h": 37},
+  {"id": "shelf",  "category": "shelf", "x": 113, "y": 46,  "z": 5,  "w": 24, "h": 37},
   {"id": "deco-1", "category": "deco",  "x": 56,  "y": 31,  "z": 6,  "w": 14, "h": 14},
-  {"id": "rug",    "category": "rug",   "x": 47,  "y": 94,  "z": 1,  "w": 49, "h": 34}
+  {"id": "rug",    "category": "rug",   "x": 47,  "y": 84,  "z": 1,  "w": 49, "h": 34}
 ]

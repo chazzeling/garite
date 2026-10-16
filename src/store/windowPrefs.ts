@@ -9,6 +9,9 @@ import {
   ensureOnScreen,
   openChatWindow,
   openShopWindow,
+  minimizeApp,
+  closeApp,
+  closeAuxiliaryWindows,
 } from "../app/windowMode";
 
 type PinByMode = Partial<Record<WindowMode, boolean>>;
@@ -22,6 +25,9 @@ interface WindowPrefsState {
   togglePin: () => Promise<void>;
   toggleChat: () => Promise<void>;
   openShop: () => Promise<void>;
+  minimize: () => Promise<void>;
+  close: () => Promise<void>;
+  closeAuxWindows: () => Promise<void>;
   fitMini: (memberCount: number) => Promise<void>;
 }
 
@@ -44,7 +50,7 @@ export const useWindowPrefs = create<WindowPrefsState>()(
         // 시작 시: 위치 보정 → 저장된 모드/핀 적용(크기는 window-state가 복원) → 채팅창 복원
         init: async () => {
           await ensureOnScreen();
-          await applyMode(get().mode, false);
+          await applyMode(get().mode, true); // 창 크기가 고정이라 항상 모드 크기로 (예전에 저장된 크기를 쓰지 않음)
           await applyPin(selectPinned(get()));
           if (get().chatOpen) await openChat();
         },
@@ -67,6 +73,9 @@ export const useWindowPrefs = create<WindowPrefsState>()(
         },
 
         openShop: () => openShopWindow(selectPinned(get())).catch(() => {}),
+        minimize: () => minimizeApp().catch(() => {}),
+        close: () => closeApp().catch(() => {}),
+        closeAuxWindows: () => closeAuxiliaryWindows().catch(() => {}),
 
         toggleChat: async () => {
           if (get().chatOpen) {
@@ -81,6 +90,14 @@ export const useWindowPrefs = create<WindowPrefsState>()(
     },
     {
       name: "windowPrefs",
+      version: 1,
+      // 1: 중간 모드를 없앴다 → 예전에 중간이었던 사람은 기본(full) 모드로
+      migrate: (state) => {
+        const s = state as { mode?: string; pinByMode?: Record<string, boolean> };
+        if (s.mode === "medium") s.mode = "full";
+        if (s.pinByMode) delete s.pinByMode.medium;
+        return s as never;
+      },
       partialize: (s) => ({ mode: s.mode, pinByMode: s.pinByMode, chatOpen: s.chatOpen }),
     },
   ),

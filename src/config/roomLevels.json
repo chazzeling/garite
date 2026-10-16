@@ -1,0 +1,7 @@
+[
+  { "level": 1, "name": "촛불",     "icon": "candle",     "minutes": 0,   "color": "#dcd6ee" },
+  { "level": 2, "name": "전구",     "icon": "bulb",       "minutes": 60,  "color": "#e4def6" },
+  { "level": 3, "name": "전등",     "icon": "lamp",       "minutes": 180, "color": "#ebe5f7" },
+  { "level": 4, "name": "샹들리에", "icon": "chandelier", "minutes": 360, "color": "#f2edf9" },
+  { "level": 5, "name": "별빛",     "icon": "stars",      "minutes": 600, "color": "#f8f4fc" }
+]

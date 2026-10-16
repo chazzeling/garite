@@ -3,6 +3,8 @@ import cfg from "../config/activity.json";
 import { isSelfApp, resolveApp } from "../activity/appWhitelist";
 import { classify, NO_MANUAL, shouldEndFocus, type ManualStatus } from "../activity/classify";
 import { decideMotion } from "../activity/motion";
+import { countsAsWork } from "../activity/workTime";
+import { useWorkPrefs } from "./workPrefs";
 import type { MemberStatus, RawActivity } from "../types";
 
 // Presence로 공유되는 내 상태 중 판정으로 정해지는 부분
@@ -11,6 +13,8 @@ export type MyStatus = Pick<MemberStatus, "state" | "motion" | "appLabel" | "cus
 interface StatusState {
   mine: MyStatus; // 값이 바뀔 때만 새 객체 → room 스토어가 이때만 Presence를 갱신
   manual: ManualStatus;
+  /** 지금 이 순간 작업 시간으로 쌓이는 중인지 (등록 프로그램 모드의 안내 표시용, 판단 보류 중엔 직전 값 유지) */
+  counting: boolean | null;
   shareApp: boolean; // 프로그램 이름을 읽고 친구에게 보여줄지 (동의한 경우만 true. 끄면 Rust도 읽지 않음)
   setShareApp: (on: boolean) => void;
   ingest: (raw: RawActivity) => void; // Rust가 2초마다 보내는 원시 신호
@@ -20,6 +24,14 @@ interface StatusState {
 
 let lastRaw: RawActivity = { idleSeconds: 0, appId: null };
 let focusMode = false;
+// 작업 시간 인정: 신호(2초)마다 인정되면 초를 누적하고, economy가 1분마다 가져가며(takeWorkSeconds) 0으로 되돌린다
+let workSeconds = 0;
+let lastIngestAt = 0;
+export const takeWorkSeconds = () => {
+  const s = workSeconds;
+  workSeconds = 0;
+  return s;
+};
 let shareApp = false; // 동의 전에는 꺼짐 (store/privacy가 켠다)
 // 이 앱이 맨 앞일 땐 직전에 쓰던 프로그램 이름을 유지 (핀 고정으로 이 앱을 만지는 동안 라벨이 깜빡이지 않게)
 let lastExternalApp: string | null = null;
@@ -53,6 +65,7 @@ export const useStatus = create<StatusState>((set, get) => {
     mine: initial,
     manual: NO_MANUAL,
     shareApp: false,
+    counting: null,
 
     setShareApp: (on) => {
       shareApp = on;
@@ -62,10 +75,22 @@ export const useStatus = create<StatusState>((set, get) => {
     },
 
     ingest: (raw) => {
+      const now = Date.now();
+      const dt = lastIngestAt ? Math.min(3, (now - lastIngestAt) / 1000) : 2;
+      lastIngestAt = now;
       lastRaw = raw;
-      if (raw.appId && !isSelfApp(raw.appId)) lastExternalApp = raw.appId;
+      if (raw.appId && !isSelfApp(raw.appId)) {
+        lastExternalApp = raw.appId;
+        useWorkPrefs.getState().see(raw.appId);
+      }
       if (focusMode && shouldEndFocus(raw.idleSeconds)) focusMode = false;
       recompute(get().manual);
+
+      const { mode, programs } = useWorkPrefs.getState();
+      const counts = countsAsWork({ state: get().mine.state, appId: raw.appId, mode, programs });
+      if (counts) workSeconds += dt;
+      const counting = counts === null ? get().counting : counts;
+      if (counting !== get().counting) set({ counting });
     },
 
     setManual: (patch) => {
