@@ -1,5 +1,6 @@
 import { selectPinned, useWindowPrefs } from "../../store/windowPrefs";
 import { useStatus } from "../../store/status";
+import { useChat } from "../../store/chat";
 import { useShownMembers } from "../../store/room";
 import { Icon } from "../common/Icon";
 import type { PanelTab } from "./RoomPanel";
@@ -10,6 +11,7 @@ export function ControlBar({ open, onSelect }: { open: PanelTab | null; onSelect
   const mode = useWindowPrefs((s) => s.mode);
   const pinned = useWindowPrefs(selectPinned);
   const chatOpen = useWindowPrefs((s) => s.chatOpen);
+  const unread = useChat((s) => s.unread);
   const focus = useStatus((s) => s.mine.focusMode);
   const count = useShownMembers().length;
   const { setMode, togglePin, toggleChat, openShop, minimize, close } = useWindowPrefs.getState();
@@ -29,8 +31,9 @@ export function ControlBar({ open, onSelect }: { open: PanelTab | null; onSelect
         </button>
       </div>
       <div className="icons">
-        <button className={`iconbtn ${chatOpen ? "on" : ""}`} onClick={toggleChat} title="채팅창" aria-label="채팅창" aria-pressed={chatOpen}>
+        <button className={`iconbtn ${chatOpen ? "on" : ""}`} onClick={() => { useChat.getState().clearUnread(); void toggleChat(); }} title={unread ? "채팅창 · 새 메시지" : "채팅창"} aria-label={unread ? "채팅창, 새 메시지 있음" : "채팅창"} aria-pressed={chatOpen}>
           <Icon name="chat" />
+          {unread && <i className="dot-badge" />}
         </button>
         <button className={`iconbtn ${focus ? "on" : ""}`} onClick={useStatus.getState().toggleFocus} title="집중 모드" aria-label="집중 모드" aria-pressed={focus}>
           <Icon name="target" />

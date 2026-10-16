@@ -1,0 +1,5 @@
+[
+  { "id": "g60",  "minutes": 60,  "coins": 40,  "label": "1시간" },
+  { "id": "g180", "minutes": 180, "coins": 100, "label": "3시간" },
+  { "id": "g300", "minutes": 300, "coins": 160, "label": "5시간" }
+]

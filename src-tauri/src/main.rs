@@ -97,6 +97,7 @@ fn main() {
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_process::init())
+        .plugin(tauri_plugin_autostart::init(tauri_plugin_autostart::MacosLauncher::LaunchAgent, None))
         .invoke_handler(tauri::generate_handler![set_app_detection, quit_app, oauth_listen, oauth_cancel, open_external])
         // 메인 창을 닫으면 앱 종료 (채팅·상점 창도 함께 닫힘)
         .on_window_event(|window, event| {

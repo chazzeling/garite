@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import type { PresenceMember } from "../types";
 import { describeError } from "../net/errors";
-import { closeRoom, createRoom, getMyRoom, heartbeat, joinRoom, kickMember, leaveRoom } from "../net/rpc";
+import { closeRoom, createRoom, getMyRoom, heartbeat, joinRoom, joinRoomByOwner, kickMember, leaveRoom } from "../net/rpc";
 import { connectRoom, type RoomConnection } from "../net/roomChannel";
 import { openUserChannel, type KickEvent } from "../net/userChannel";
 import { useChat } from "./chat";
@@ -29,6 +29,7 @@ interface RoomState {
   // 메인 창
   start: () => Promise<void>;
   joinByCode: (code: string) => Promise<void>;
+  joinByOwner: (ownerId: string) => Promise<void>;
   goHome: () => Promise<void>;
   createRoom: () => Promise<void>;
   closeRoom: () => Promise<void>;
@@ -249,6 +250,17 @@ export const useRoom = create<RoomState>((set, get) => {
       set({ notice: null, kicked: null });
       try {
         const owner = await joinRoom(code);
+        await enter(owner);
+        await userChannel?.notifyRoomChanged();
+      } catch (err) {
+        set({ notice: describeError(err) });
+      }
+    },
+
+    joinByOwner: async (ownerId) => {
+      set({ notice: null, kicked: null });
+      try {
+        const owner = await joinRoomByOwner(ownerId);
         await enter(owner);
         await userChannel?.notifyRoomChanged();
       } catch (err) {

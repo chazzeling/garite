@@ -19,3 +19,14 @@ export function formatUnits(units: number): string {
 
 /** 코인 → 화면 문구 */
 export const formatCoins = (coins: number): string => formatUnits(toUnits(coins));
+
+/** 분 → "45분" / "2시간" / "2시간 5분" (통계 표시용) */
+export function formatMinutes(minutes: number): string {
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  if (h === 0) return `${m}분`;
+  return m === 0 ? `${h}시간` : `${h}시간 ${m}분`;
+}
+
+/** 한국 시간 기준 날짜(YYYY-MM-DD). 하루 목표가 초기화되는 기준이며 서버의 kst_today()와 같아야 한다 */
+export const kstDay = (now: number = Date.now()): string => new Date(now + 9 * 3600_000).toISOString().slice(0, 10);

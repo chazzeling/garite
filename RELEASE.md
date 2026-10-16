@@ -5,7 +5,7 @@
 ## 0. 원칙
 
 - **DB 먼저, 앱 나중.** 새 앱은 새 DB 함수를 부른다(예: `log_minute(p_strict)`). 앱을 먼저 내보내면 새 기능이 오류를 낸다. 예전 앱은 새 DB에서도 동작하도록 만들어져 있다.
-- 마이그레이션 0007~0010은 **다시 실행해도 안전**하다(이미 적용된 부분은 건너뜀). 헷갈리면 네 개를 순서대로 다 돌려도 된다. (0004 이전은 다시 실행하면 오류)
+- 마이그레이션 0007~0011은 **다시 실행해도 안전**하다(이미 적용된 부분은 건너뜀). 헷갈리면 다섯 개를 순서대로 다 돌려도 된다. (0004 이전은 다시 실행하면 오류)
 - 비밀 값(`.env.local`, `~/.tauri/garite.key`)은 저장소에 올리지 않는다.
 
 ## 1. DB 상태 확인 (Supabase → SQL Editor)
@@ -29,7 +29,15 @@ select item, ok from (
 ) t order by n;
 ```
 
-- `false`가 있으면 해당 번호의 마이그레이션 파일(`supabase/migrations/`)을 **열어서 통째로 붙여 넣고 실행**한다. 순서는 0007 → 0008 → 0009 → 0010.
+- `false`가 있으면 해당 번호의 마이그레이션 파일(`supabase/migrations/`)을 **열어서 통째로 붙여 넣고 실행**한다. 순서는 0007 → 0008 → 0009 → 0010 → 0011. (0011은 아래 "0011 확인"으로 따로 확인)
+- **0011 확인**: 새 SQL 탭에서 아래를 실행해 전부 `true`면 적용된 것.
+  ```sql
+  select '테이블 goal_claims' as 항목, to_regclass('public.goal_claims') is not null as ok
+  union all select 'claim_goals()', exists(select 1 from pg_proc where proname = 'claim_goals' and pronamespace = 'public'::regnamespace)
+  union all select 'get_goals()', exists(select 1 from pg_proc where proname = 'get_goals' and pronamespace = 'public'::regnamespace)
+  union all select 'join_room_by_owner', exists(select 1 from pg_proc where proname = 'join_room_by_owner' and pronamespace = 'public'::regnamespace)
+  union all select '채팅 도배 제한 트리거', exists(select 1 from pg_trigger where tgname = 'messages_rate_limit_trg');
+  ```
 - 마이그레이션을 실행한 뒤에는 API 캐시를 새로 읽게 한다:
 
 ```sql
@@ -128,6 +136,16 @@ notify pgrst, 'reload schema';
 - [ ] 우측 하단 시계: "기록"은 방 만든 뒤 시간, "작업"은 등록 모드일 때만 숫자
 - [ ] 방 레벨: 시간 단계 변화(위 3번 SQL로 시간 앞당기기) — 촛불→전구→전등…, "방이 ○○ 단계가 됐어요!" 알림, 배경이 밝아짐
 - [ ] 레벨 칩 마우스 오버 툴팁: `Lv.2 · 70/150불씨 · 80불씨 남음 · 보유 …`
+
+### E2. 목표 · 통계 · 자주 가는 방 · 알림 (0011 이후)
+- [ ] 내 상태 → "오늘의 작업"에 오늘/이번 주 시간이 보이고, 1시간(60분) 작업하면 배너 "오늘 1시간 작업 달성! 보너스 20불씨" + 불씨가 40코인(=20불씨) 늘어난다. 같은 날 다시 받지 않는다(앱을 껐다 켜도)
+- [ ] 한국 시간 자정이 지나면 목표가 새로 시작된다
+- [ ] 채팅창을 닫아 둔 채 친구가 메시지를 보내면 채팅 버튼에 점이 뜨고, 버튼을 누르면 사라진다 (숫자 없음)
+- [ ] 멤버 목록의 ☆로 친구를 저장 → "방" 시트의 "자주 가는 방"에서 [입장]이 친구의 **지금** 방으로 들어간다 (친구가 방을 새로 만들어 코드가 바뀌어도 동작, 방이 없으면 "방을 찾을 수 없어요")
+- [ ] 내 상태 → "로그인할 때 자동 실행"을 켜고 재부팅하면 앱이 같이 켜진다 (mac: 시스템 설정 → 로그인 항목에 표시, Windows: 작업 관리자 → 시작 앱)
+- [ ] 채팅을 10초에 20개 넘게 보내면 "메시지를 너무 빨리 보내고 있어요" (정상 대화에서는 안 걸림)
+- [ ] 미니 모드에서 업데이트 / 찌르기 / 강퇴 / 서버 끊김 알림이 얼굴 줄 오른쪽에 한 개씩 뜨고 버튼이 동작한다
+- [ ] 내 상태 → "진단 정보 복사"를 누르고 붙여넣으면 버전·연결 상태·최근 오류가 나온다 (이름·채팅 내용은 없음)
 
 ### F. 꾸미기 · 상점
 - [ ] 상점(가방 아이콘) → 옷장: 피부색·머리·머리색·옷·옷색·악세서리 선택이 바로 반영

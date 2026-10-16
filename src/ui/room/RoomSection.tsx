@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import { Icon } from "../common/Icon";
 import { useMe } from "../../store/me";
 import { useRoom } from "../../store/room";
+import { useFavorites } from "../../store/favorites";
 
 // 방 만들기 · 코드 · 입장 설정 · 코드로 입장
 export function RoomSection() {
   const { userId, myRoom } = useMe();
   const ownerId = useRoom((s) => s.ownerId);
+  const favorites = useFavorites((s) => s.list);
   const [code, setCode] = useState("");
   const [copied, setCopied] = useState(false);
   const [confirmClose, setConfirmClose] = useState(false);
@@ -89,6 +91,24 @@ export function RoomSection() {
           <input value={code} maxLength={8} placeholder="코드 6자리" onChange={(e) => setCode(e.target.value.toUpperCase())} />
           <button className="primary" disabled={!code.trim()}>입장</button>
         </form>
+        {favorites.length > 0 && (
+          <>
+            <div className="field-label">자주 가는 방</div>
+            <ul className="favs">
+              {favorites.map((f) => (
+                <li key={f.userId}>
+                  <span>{f.name}</span>
+                  <button className="sm primary" disabled={ownerId === f.userId} onClick={() => void useRoom.getState().joinByOwner(f.userId)}>
+                    {ownerId === f.userId ? "여기 있어요" : "입장"}
+                  </button>
+                  <button className="ghost sm" onClick={() => useFavorites.getState().remove(f.userId)} aria-label={`${f.name} 삭제`} title="목록에서 빼기">
+                    <Icon name="close" size={11} />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
         {away && <button className="ghost" onClick={() => void useRoom.getState().goHome()}><Icon name="door" size={13} /> 내 방으로 돌아가기</button>}
       </div>
     </div>

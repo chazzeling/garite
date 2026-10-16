@@ -6,6 +6,7 @@ import { usePoke } from "../../store/poke";
 import { characterSprite, faceImage, STATE_LABEL } from "../../assets/registry";
 import { useMe } from "../../store/me";
 import { useRoom, useShownMembers } from "../../store/room";
+import { useFavorites } from "../../store/favorites";
 
 const REASONS = ["자리 비움", "방 정리"];
 const CUSTOM = "__custom";
@@ -14,6 +15,7 @@ export function MemberSection() {
   const userId = useMe((s) => s.userId);
   const ownerId = useRoom((s) => s.ownerId);
   const members = useShownMembers();
+  const favorites = useFavorites((s) => s.list);
   const [kicking, setKicking] = useState<string | null>(null);
   const [preset, setPreset] = useState(REASONS[0]);
   const [custom, setCustom] = useState("");
@@ -42,6 +44,16 @@ export function MemberSection() {
               {m.userId === ownerId && <span title="방장"> 👑</span>}
               <small>{m.customText ?? m.appLabel ?? STATE_LABEL[m.state]}</small>
             </span>
+            {m.userId !== userId && (
+              <button
+                className="ghost sm"
+                title={favorites.some((f) => f.userId === m.userId) ? "자주 가는 방에서 빼기" : "자주 가는 방에 저장 (이 친구의 방으로 바로 입장)"}
+                aria-pressed={favorites.some((f) => f.userId === m.userId)}
+                onClick={() => useFavorites.getState().toggle(m.userId, m.name)}
+              >
+                {favorites.some((f) => f.userId === m.userId) ? "★" : "☆"}
+              </button>
+            )}
             {m.userId !== userId && (
               <button
                 className="ghost sm"

@@ -1,6 +1,10 @@
+import { useEffect, useState } from "react";
+import { getAutostart, setAutostart } from "../../app/autostart";
 import { usePrivacy } from "../../store/privacy";
 import { useWorkPrefs } from "../../store/workPrefs";
+import { GoalsCard } from "./GoalsCard";
 import { AccountCard } from "./AccountCard";
+import { DiagnosticsCard } from "./DiagnosticsCard";
 import { useStatus } from "../../store/status";
 import type { Motion, WorkState } from "../../types";
 import cfg from "../../config/activity.json";
@@ -31,9 +35,14 @@ export function StatusPanel() {
   const known = new Map(recent.map((r) => [r.key, r.label]));
   const listed = [...new Set([...programs, ...recent.map((r) => r.key)])];
   const { setManual, toggleFocus } = useStatus.getState();
+  const [autostart, setAuto] = useState(false);
+  useEffect(() => {
+    void getAutostart().then(setAuto);
+  }, []);
 
   return (
     <div className="stack">
+      <GoalsCard />
       <div className="card">
         <div className="card-title">지금 상태</div>
         <div className="chips">
@@ -121,9 +130,18 @@ export function StatusPanel() {
             <small>끄면 친구에게 안 보여요 (작업 시간 인정에는 내 컴퓨터에서만 써요)</small>
           </span>
         </label>
+        <label className="switch row">
+          <input type="checkbox" checked={autostart} onChange={(e) => void setAutostart(e.target.checked).then(setAuto)} />
+          <span className="track" />
+          <span className="switch-text">
+            <b>로그인할 때 자동 실행</b>
+            <small>컴퓨터를 켜면 개릿도 같이 켜져요</small>
+          </span>
+        </label>
       </div>
 
       <AccountCard />
+      <DiagnosticsCard />
     </div>
   );
 }

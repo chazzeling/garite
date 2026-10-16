@@ -24,10 +24,17 @@ const MESSAGES: Record<string, string> = {
   ALREADY_UNLOCKED: "이미 해금한 아이템이에요.",
   LEVEL_TOO_LOW: "레벨이 부족해요.",
   NOT_ENOUGH_COINS: "불씨가 부족해요.",
+  CHAT_RATE_LIMIT: "메시지를 너무 빨리 보내고 있어요. 잠시 뒤에 다시 보내주세요.",
 };
+
+// 최근 오류 기록 (진단 정보 복사용). 메모리에만 두고 20개까지 — 개인정보가 없는 오류 문구만 남긴다.
+const recent: { at: string; message: string }[] = [];
+export const recentErrors = (): readonly { at: string; message: string }[] => recent;
 
 export function describeError(err: unknown): string {
   const message = (err as { message?: string } | null)?.message ?? String(err);
+  recent.push({ at: new Date().toISOString(), message: message.slice(0, 200) });
+  if (recent.length > 20) recent.shift();
   for (const code of Object.keys(MESSAGES)) {
     if (message.includes(code)) return MESSAGES[code];
   }

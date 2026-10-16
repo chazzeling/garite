@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { Sprite } from "../common/Sprite";
+import { MiniAlert } from "../common/MiniAlert";
 import { WindowControls } from "../common/WindowControls";
 import { faceIcon, faceImage, STATE_LABEL } from "../../assets/registry";
 import { useRoom, useShownMembers } from "../../store/room";
@@ -25,6 +26,7 @@ export function MiniMode() {
             </span>
           </div>
         ))}
+        <MiniAlert />
       </div>
       {/* 아래 줄: 이름·상태 / 쓰는 프로그램 */}
       <div className="mini-bar" data-tauri-drag-region>
@@ -34,10 +36,9 @@ export function MiniMode() {
             <span key={m.userId} className="mini-member" data-tauri-drag-region>
               <span className="top" data-tauri-drag-region>
                 <i className={`dot ${m.state}`} />
-                {m.name}
-                <em>{STATE_LABEL[m.state]}</em>
+                <span className="nm" title={`${m.name} · ${STATE_LABEL[m.state]}`}>{m.name}</span>
               </span>
-              <span className="sub" data-tauri-drag-region>{m.customText ?? m.appLabel ?? ""}</span>
+              <span className="sub" data-tauri-drag-region title={m.customText ?? m.appLabel ?? ""}>{m.customText ?? m.appLabel ?? ""}</span>
             </span>
           ))}
         </span>

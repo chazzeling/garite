@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useChat } from "../store/chat";
 import { useEconomy } from "../store/economy";
 import { useMe } from "../store/me";
 import { useRoom } from "../store/room";
@@ -6,6 +7,7 @@ import { usePrivacy } from "../store/privacy";
 import { useUpdate } from "../store/update";
 import { useWindowPrefs } from "../store/windowPrefs";
 import { UpdateBanner } from "../ui/common/UpdateBanner";
+import { GoalBanner } from "../ui/common/GoalBanner";
 import { PokeBanner } from "../ui/common/PokeBanner";
 import { ConsentDialog } from "../ui/common/ConsentDialog";
 import { ProfileSetup } from "../ui/common/ProfileSetup";
@@ -24,6 +26,7 @@ export function App() {
 
   useEffect(() => {
     useWindowPrefs.getState().init();
+    useChat.setState({ trackUnread: true }); // 안 읽은 채팅 점은 메인 창에서만
     // 새 버전 확인: 켜고 10초 뒤 한 번, 이후 30분마다
     const first = setTimeout(() => void useUpdate.getState().check(), 10_000);
     const every = setInterval(() => void useUpdate.getState().check(), 30 * 60_000);
@@ -71,6 +74,7 @@ export function App() {
       <div className="banners">
         <UpdateBanner />
         <PokeBanner />
+        <GoalBanner />
         <KickedBanner />
         <ServerBanner />
       </div>

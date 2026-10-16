@@ -248,17 +248,18 @@ header { padding: 4px 8px; }
 /* ── 미니 모드: 위 44 = 얼굴 탭(인덱스처럼 위로 솟음, 나머지는 투명), 아래 44 = 상태 바 ─────────── */
 .mini { height: 88px; display: flex; flex-direction: column; justify-content: flex-end; }
 .mini-faces { height: 44px; display: flex; align-items: flex-end; padding-left: 8px; }
-.mini-tab { width: 130px; display: flex; align-items: flex-end; }
-.face-tab { width: 40px; height: 40px; display: grid; place-items: center; font-size: 22px; background: var(--surface); border: var(--bd); border-bottom: 0; border-radius: 4px 4px 0 0; margin-bottom: -1px; position: relative; z-index: 1; } /* 아래 테두리를 가려 바와 이어 붙인다 */
+.mini-tab { width: 60px; display: flex; align-items: flex-end; }
+.face-tab { width: 58px; height: 40px; display: grid; place-items: center; font-size: 22px; background: var(--surface); border: var(--bd); border-bottom: 0; border-radius: 4px 4px 0 0; margin-bottom: -1px; position: relative; z-index: 1; } /* 아래 테두리를 가려 바와 이어 붙인다 */
 .face-tab.working { background: #d9f2e4; }
 .face-tab.idle { background: #fbecc9; }
 .face-tab.away { background: #e6e3f0; }
 .mini-bar { height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 6px 0 8px; background: var(--surface); border: var(--bd); border-radius: var(--radius); box-shadow: var(--shadow-sm); }
 .mini-members { display: flex; overflow: hidden; white-space: nowrap; min-width: 0; }
-.mini-member { width: 130px; display: flex; flex-direction: column; justify-content: center; min-width: 0; line-height: 1.3; }
-.mini-member .top { display: flex; align-items: center; gap: 4px; font-weight: 600; }
+.mini-member { width: 60px; padding-right: 6px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; min-width: 0; line-height: 1.3; }
+.mini-member .top { display: flex; align-items: center; gap: 4px; font-weight: 600; min-width: 0; }
+.mini-member .top .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
 .mini-member .top em { font-style: normal; font-weight: 400; color: var(--muted); }
-.mini-member .sub { color: var(--muted); overflow: hidden; text-overflow: ellipsis; max-width: 120px; min-height: 16px; }
+.mini-member .sub { color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; min-height: 16px; }
 .mini .controls { height: auto; padding: 0; border: 0; background: transparent; box-shadow: none; gap: 4px; flex: none; }
 .mini .icons { gap: 0; }
 .mini .iconbtn { width: 24px; height: 24px; }
@@ -337,3 +338,26 @@ header { padding: 4px 8px; }
 /* 방 위에 얹힌 레벨 칩·하단 컨트롤 줄은 외곽선도 없앰 (묶음 사이 구분선만 남김) */
 .hud .chip { border: 0; box-shadow: none; }
 .stage-bar .controls { border: 0; box-shadow: none; }
+
+/* 안 읽은 채팅: 숫자 없이 점만 */
+.iconbtn .dot-badge { position: absolute; right: 3px; top: 3px; width: 8px; height: 8px; border-radius: 50%; background: var(--accent-600); border: 1px solid var(--surface); }
+
+/* 오늘의 작업 · 목표 */
+.stat-row { display: flex; gap: 16px; align-items: baseline; }
+.stat-row b { font-size: 15px; }
+.stat-row small, .goal small { color: var(--ink-soft, var(--ink)); opacity: .7; }
+.goal-list { display: flex; flex-direction: column; gap: 2px; }
+.goal { display: flex; justify-content: space-between; font-size: 13px; opacity: .65; }
+.goal.done { opacity: 1; color: var(--accent-ink); }
+
+/* 자주 가는 방 */
+.favs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.favs li { display: flex; align-items: center; gap: 6px; }
+.favs li span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* 미니 모드 알림: 얼굴 줄 오른쪽 빈 곳 */
+.mini-faces { position: relative; }
+.mini-alert { position: absolute; right: 4px; bottom: 4px; max-width: calc(100% - 140px); min-width: 120px; display: flex; align-items: center; gap: 6px; padding: 3px 4px 3px 8px; border: var(--bd); border-radius: var(--radius); background: #ffe9a8; font-size: 12px; box-shadow: var(--shadow-sm); }
+.mini-alert.update { background: var(--accent-soft); }
+.mini-alert span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mini-alert button { height: 20px; padding: 0 6px; background: var(--surface); }

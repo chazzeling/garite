@@ -116,6 +116,6 @@ export async function openShopWindow(pinned: boolean) {
 
 // 미니 모드 너비는 멤버 수에 따라 가변 (높이 44 고정)
 export async function fitMiniWidth(memberCount: number) {
-  const width = 210 + Math.max(memberCount, 1) * 130; // 컨트롤 영역 210 + 멤버 칸 130
+  const width = 210 + Math.max(memberCount, 1) * 60; // 컨트롤 영역 210 + 멤버 칸 60
   await getCurrentWindow().setSize(new LogicalSize(width, MODE_SIZE.mini.h));
 }

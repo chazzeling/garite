@@ -1,0 +1,40 @@
+# 푸시·PR마다 자동 점검: 타입 검사 + 로직/카탈로그 검사 + 웹 빌드, 그리고 Rust 테스트.
+# 배포(release.yml)는 v* 태그에서만 돌고, 이 점검은 배포와 별개다.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npx vite build
+
+  rust:
+    # Tauri는 OS별 코드(mac/windows)가 있어 두 곳 모두에서 컴파일과 테스트를 확인한다
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "./src-tauri -> target"
+      # tauri 빌드 스크립트가 frontendDist(dist)를 요구한다
+      - run: mkdir -p dist && echo "<!doctype html>" > dist/index.html
+        shell: bash
+      - run: cargo test --manifest-path src-tauri/Cargo.toml

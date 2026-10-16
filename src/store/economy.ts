@@ -9,6 +9,7 @@ import { useMe } from "./me";
 import cfg from "../config/activity.json";
 import { takeWorkSeconds } from "./status";
 import { useWorkPrefs } from "./workPrefs";
+import { useGoals } from "./goals";
 
 interface EconomyState {
   earned: number; // 누적 적립 (레벨 기준, 줄지 않음)
@@ -52,7 +53,10 @@ export const useEconomy = create<EconomyState>((set, get) => {
   const tick = async () => {
     if (takeWorkSeconds() < cfg.workMinuteThresholdSeconds) return;
     try {
-      if ((await logMinute(useWorkPrefs.getState().mode === "programs")) > 0) await get().refresh();
+      if ((await logMinute(useWorkPrefs.getState().mode === "programs")) > 0) {
+        await useGoals.getState().afterMinute(); // 목표에 닿았으면 보너스를 받고
+        await get().refresh();
+      }
     } catch {
       /* 실패한 분은 그냥 건너뛴다 */
     }
@@ -82,6 +86,7 @@ export const useEconomy = create<EconomyState>((set, get) => {
           }
         }
         await load();
+        void useGoals.getState().refresh();
       } catch (err) {
         set({ notice: describeError(err) });
       }

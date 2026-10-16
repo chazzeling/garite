@@ -3,6 +3,8 @@ import type { ChatMessage } from "../types";
 import { loadRecent, sendChat } from "../net/chatApi";
 import { describeError } from "../net/errors";
 import { fetchProfiles } from "../net/rpc";
+import { useMe } from "./me";
+import { useWindowPrefs } from "./windowPrefs";
 
 const BUBBLE_MS = 3000;
 const MAX_KEPT = 200;
@@ -16,6 +18,10 @@ interface ChatState {
   names: Record<string, string>; // userId → 이름
   bubbles: Record<string, Bubble>; // userId → 머리 위 말풍선 (3초)
   error: string | null;
+  /** 채팅창이 닫혀 있는 동안 남이 보낸 메시지가 왔는지 (메인 창에서만 켠다) */
+  unread: boolean;
+  trackUnread: boolean;
+  clearUnread: () => void;
   load: (ownerId: string) => Promise<void>;
   receive: (message: ChatMessage) => void;
   send: (ownerId: string, userId: string, body: string) => Promise<boolean>;
@@ -40,6 +46,9 @@ export const useChat = create<ChatState>((set, get) => {
     names: {},
     bubbles: {},
     error: null,
+    unread: false,
+    trackUnread: false,
+    clearUnread: () => set({ unread: false }),
 
     load: async (ownerId) => {
       try {
@@ -63,6 +72,7 @@ export const useChat = create<ChatState>((set, get) => {
 
       if (message.kind !== "chat" || !message.userId) return;
       const userId = message.userId;
+      if (get().trackUnread && userId !== useMe.getState().userId && !useWindowPrefs.getState().chatOpen) set({ unread: true });
       set((s) => ({ bubbles: { ...s.bubbles, [userId]: { id: message.id, text: message.body } } }));
       clearTimeout(bubbleTimers.get(userId));
       bubbleTimers.set(

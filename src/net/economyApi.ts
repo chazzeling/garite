@@ -52,3 +52,18 @@ export async function fetchEquipped(userId: string): Promise<Record<string, stri
 export async function equipItem(userId: string, slotId: string, itemId: string): Promise<void> {
   check(await supabase.from("equipped").upsert({ user_id: userId, slot_id: slotId, item_id: itemId }));
 }
+
+export type GoalsRow = { todayMinutes: number; weekMinutes: number; claimed: string[] };
+
+/** 오늘·이번 주(월요일 시작, 한국 시간) 작업 분 + 오늘 받은 목표 */
+export async function fetchGoals(): Promise<GoalsRow> {
+  const rows = check(await supabase.rpc("get_goals")) as { today_minutes: number; week_minutes: number; claimed: string[] | null }[];
+  const r = rows[0];
+  return { todayMinutes: Number(r?.today_minutes ?? 0), weekMinutes: Number(r?.week_minutes ?? 0), claimed: r?.claimed ?? [] };
+}
+
+/** 달성했지만 아직 안 받은 목표를 받는다. 새로 받은 것만 돌려준다 */
+export async function claimGoals(): Promise<{ goalId: string; coins: number }[]> {
+  const rows = check(await supabase.rpc("claim_goals")) as { goal_id: string; coins: number }[];
+  return (rows ?? []).map((r) => ({ goalId: r.goal_id, coins: Number(r.coins) }));
+}

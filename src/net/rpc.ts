@@ -50,6 +50,11 @@ export async function regenerateCode(): Promise<string> {
 }
 
 /** 성공하면 입장한 방의 방장 id */
+/** 친구(방장) id로 그 사람의 지금 방에 입장 (자주 가는 방) */
+export async function joinRoomByOwner(ownerId: string): Promise<string> {
+  return check(await supabase.rpc("join_room_by_owner", { p_owner: ownerId }));
+}
+
 export async function joinRoom(code: string): Promise<string> {
   return check(await supabase.rpc("join_room", { p_code: code }));
 }

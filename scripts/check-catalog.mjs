@@ -31,4 +31,14 @@ for (const [table, rows] of pairs) {
   console.log(`${same ? "OK  " : "DIFF"} ${table}`);
   if (!same) bad++;
 }
+
+// 하루 목표: goals.json ↔ goal_tiers() 의 values (id, 분, 코인)
+{
+  const m = sql.match(/goal_tiers\(\)[\s\S]*?from \(values([\s\S]*?)\) as t/);
+  const server = m ? [...m[1].matchAll(/\('([^']+)',\s*(\d+),\s*(\d+)\)/g)].map((r) => `${r[1]}|${r[2]}|${r[3]}`).sort().join("\n") : "";
+  const client = json("goals").map((g) => `${g.id}|${g.minutes}|${g.coins}`).sort().join("\n");
+  const same = server !== "" && server === client;
+  console.log(`${same ? "OK  " : "DIFF"} goal_tiers`);
+  if (!same) bad++;
+}
 process.exit(bad ? 1 : 0);
