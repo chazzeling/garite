@@ -1,0 +1,9 @@
+{
+  "workingBelowSeconds": 120,
+  "awayAboveSeconds": 600,
+  "motionWithinSeconds": 30,
+  "presenceMinIntervalSeconds": 30,
+  "focusTimeoutSeconds": 1800,
+  "customTextMax": 30,
+  "pokeCooldownSeconds": 30
+}

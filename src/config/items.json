@@ -1,0 +1,11 @@
+[
+  {"id": "bed-basic", "name": "기본 침대", "category": "bed", "unlockLevel": 1, "cost": 0},
+  {"id": "bed-quilt", "name": "퀼트 침대", "category": "bed", "unlockLevel": 3, "cost": 120},
+  {"id": "desk-basic", "name": "기본 책상", "category": "desk", "unlockLevel": 1, "cost": 0},
+  {"id": "desk-wood", "name": "원목 책상", "category": "desk", "unlockLevel": 2, "cost": 80},
+  {"id": "shelf-basic", "name": "책장", "category": "shelf", "unlockLevel": 2, "cost": 60},
+  {"id": "deco-plant", "name": "화분", "category": "deco", "unlockLevel": 2, "cost": 50},
+  {"id": "deco-lamp", "name": "스탠드", "category": "deco", "unlockLevel": 4, "cost": 200},
+  {"id": "rug-basic", "name": "기본 러그", "category": "rug", "unlockLevel": 1, "cost": 0},
+  {"id": "rug-round", "name": "둥근 러그", "category": "rug", "unlockLevel": 5, "cost": 300}
+]

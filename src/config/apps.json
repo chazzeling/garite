@@ -1,0 +1,9 @@
+[
+  { "match": ["chrome.exe", "Google Chrome"], "label": "크롬", "motion": "typing" },
+  { "match": ["Safari"], "label": "사파리", "motion": "typing" },
+  { "match": ["Photoshop.exe", "Adobe Photoshop"], "label": "포토샵", "motion": "drawing" },
+  { "match": ["CLIPStudioPaint.exe", "CLIP STUDIO PAINT"], "label": "클립 스튜디오", "motion": "drawing" },
+  { "match": ["Aseprite"], "label": "에스프라이트", "motion": "drawing" },
+  { "match": ["WINWORD.EXE", "Microsoft Word"], "label": "워드", "motion": "typing" },
+  { "match": ["Code.exe", "Code"], "label": "VS Code", "motion": "typing" }
+]

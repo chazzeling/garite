@@ -1,0 +1,7 @@
+[
+  { "level": 1, "requiredTotal": 0 },
+  { "level": 2, "requiredTotal": 100 },
+  { "level": 3, "requiredTotal": 300 },
+  { "level": 4, "requiredTotal": 600 },
+  { "level": 5, "requiredTotal": 1000 }
+]
